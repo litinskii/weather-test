@@ -2,5 +2,9 @@
   "allow_location": "Do you allow to proceed your location ?",
   "allow_location_again": "All the same, allow processing to proceed your location ?",
   "not_supported_get_location": "Geolocation is not supported by this browser.",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "color_range_label": "Change range to see how temperature depend on color",
+  "start": "Start",
+  "end": "End",
+  "current": "Current"
 }

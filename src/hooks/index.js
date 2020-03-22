@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import { useState, useEffect, useReducer } from "react";
 import tinygradient from "tinygradient";
 import i18n from "../i18n.json";
 

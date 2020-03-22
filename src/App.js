@@ -1,11 +1,10 @@
-import React, { useEffect, useReducer } from "react";
+import React from "react";
 import i18n from "./i18n.json";
 import {
   useIsSupportGetLocation,
   useGetPermissionToGetLocation
 } from "./hooks";
 import WeatherByLocation from "./components/WeatherByLocation";
-
 import "./App.css";
 
 function App() {
