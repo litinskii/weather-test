@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useReducer } from "react";
+import tinygradient from "tinygradient";
 import i18n from "../i18n.json";
 
 export const useIsSupportGetLocation = () => {
@@ -167,4 +168,39 @@ export const useGetWeatherInformation = ({ latitude, longitude } = {}) => {
   }, [latitude, longitude]);
 
   return [state.weather, state.error, state.loading];
+};
+
+// https://rosettacode.org/wiki/Map_range
+const mapRange = (value, inputStart, inputEnd, outputStart, outputEnd) => {
+  return (
+    ((value - inputStart) * (outputEnd - outputStart)) /
+      (inputEnd - inputStart) +
+    outputStart
+  );
+};
+
+export const useGetBackgroundColorByTemperature = temperature => {
+  if (!temperature) {
+    return;
+  }
+
+  // Get boundary values for temperature.
+  const temperatureForCalculation =
+    temperature > 30 ? 30 : temperature < -10 ? -10 : temperature;
+
+  // Total range for temperature is 40 [-10, +30].
+  // Use built in color approximation by tinygradient lib.
+  // Make gradient for boundary values and specify position.
+
+  const gradient = tinygradient([
+    { color: "#00ffff", pos: 0 }, // color for -10
+    { color: "#fff700", pos: 0.5 }, // color for  + 10
+    { color: "#ff8c00", pos: 1 } // color for + 30
+  ]);
+
+  const color = gradient.rgbAt(
+    mapRange(temperatureForCalculation, -10, 30, 0, 1)
+  );
+
+  return color.toHexString();
 };
