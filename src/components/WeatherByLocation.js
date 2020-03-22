@@ -1,19 +1,39 @@
 import React, { useEffect, useReducer } from "react";
-import { useGetLocation } from "../hooks";
+import { useGetLocation, useGetWeatherInformation } from "../hooks";
 import i18n from "../i18n.json";
 
 function WeatherByLocation() {
-  const [position, error, loading] = useGetLocation();
+  const [
+    coords,
+    errorWhileGetLocation,
+    loadingWhileGetLocation
+  ] = useGetLocation();
+  const [
+    weather,
+    errorWhileGetWeatherInformation,
+    loadingWhileGetWeatherInformation
+  ] = useGetWeatherInformation(coords);
 
-  if (loading) {
+  if (loadingWhileGetLocation || loadingWhileGetWeatherInformation) {
     return <span>{i18n.loading}</span>;
   }
 
-  if (error) {
-    return <span>{error}</span>;
+  if (errorWhileGetLocation || errorWhileGetWeatherInformation) {
+    return (
+      <span>{errorWhileGetLocation || errorWhileGetWeatherInformation}</span>
+    );
   }
 
-  return <span></span>;
+  return (
+    <div>
+      {weather.weather_state_abbr && weather.weather_state_name ? (
+        <img
+          alt={weather.weather_state_name}
+          src={`https://www.metaweather.com/static/img/weather/png/64/${weather.weather_state_abbr}.png`}
+        ></img>
+      ) : null}
+    </div>
+  );
 }
 
 export default WeatherByLocation;

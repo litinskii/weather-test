@@ -42,38 +42,129 @@ export const useGetPermissionToGetLocation = isGetLocationSupported => {
 
 function reducerForGetLocation(state, action) {
   switch (action.type) {
+    case "start":
+      return {
+        ...state,
+        ...{ coords: {}, loading: true, error: "" }
+      };
     case "succes":
       return {
         ...state,
-        ...{ position: action.payload, loading: false, error: "" }
+        ...{ coords: action.payload, loading: false, error: "" }
       };
     case "error":
       return {
         ...state,
         ...{
-          position: {},
+          coords: {},
           loading: false,
           error: `ERROR(${action.payload.code}): ${action.payload.message}`
         }
       };
     default:
-      throw new Error();
+      throw new Error("Unknow action for reducerForGetLocation");
   }
 }
 
 export const useGetLocation = () => {
   const [state, dispatch] = useReducer(reducerForGetLocation, {
     loading: true,
-    position: {},
+    coords: {},
     error: ""
   });
 
   useEffect(() => {
+    dispatch({ type: "start" });
+
     navigator.geolocation.getCurrentPosition(
-      position => dispatch({ type: "succes", payload: position }),
+      position => dispatch({ type: "succes", payload: position.coords }),
       error => dispatch({ type: "error", payload: error })
     );
   }, []);
 
-  return [state.position, state.error, state.loading];
+  return [state.coords, state.error, state.loading];
+};
+
+function reducerForGetWeatherInformation(state, action) {
+  switch (action.type) {
+    case "start":
+      return {
+        ...state,
+        ...{ loading: true, weather: {}, error: "" }
+      };
+
+    case "error":
+      return {
+        ...state,
+        ...{
+          loading: false,
+          weather: {},
+          error: action.payload
+        }
+      };
+    case "succes":
+      return {
+        ...state,
+        ...{
+          loading: false,
+          weather: action.payload,
+          error: ""
+        }
+      };
+    default:
+      throw new Error("Unknow action for reducerForGetLocation");
+  }
+}
+
+export const useGetWeatherInformation = ({ latitude, longitude } = {}) => {
+  const [state, dispatch] = useReducer(reducerForGetWeatherInformation, {
+    loading: true,
+    weather: {},
+    error: ""
+  });
+
+  useEffect(() => {
+    let didCancel = false;
+
+    if (!latitude || !longitude) {
+      return;
+    }
+
+    dispatch({ type: "start" });
+
+    const getWeatherInformation = async () => {
+      try {
+        const [{ woeid }] = await (
+          await fetch(`/api/location/search/?lattlong=${latitude},${longitude}`)
+        ).json();
+
+        const {
+          consolidated_weather: [
+            { weather_state_name, weather_state_abbr, the_temp }
+          ]
+        } = await (await fetch(`/api/location/${woeid}/`)).json();
+
+        if (!didCancel) {
+          dispatch({
+            type: "succes",
+            payload: { weather_state_name, weather_state_abbr, the_temp }
+          });
+        }
+      } catch (error) {
+        if (!didCancel) {
+          dispatch({
+            type: "error",
+            payload: "Error while trying to get weather information =("
+          });
+        }
+      }
+    };
+
+    getWeatherInformation();
+    return () => {
+      didCancel = true;
+    };
+  }, [latitude, longitude]);
+
+  return [state.weather, state.error, state.loading];
 };
