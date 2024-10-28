@@ -4,10 +4,10 @@
   "private": true,
   "dependencies": {
     "express": "^4.17.1",
-    "http-proxy-middleware": "^1.0.3",
+    "http-proxy-middleware": "^3.0.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.1",
     "tinygradient": "^1.1.1"
   },
   "scripts": {
